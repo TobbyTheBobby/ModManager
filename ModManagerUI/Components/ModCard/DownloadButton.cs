@@ -1,12 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Threading.Tasks;
 using Modio.Models;
 using ModManager.AddonSystem;
 using ModManager.VersionSystem;
-using ModManagerUI.EventSystem;
 using ModManagerUI.UiSystem;
-using Timberborn.SingletonSystem;
 using UnityEngine.UIElements;
-using EventBus = ModManagerUI.EventSystem.EventBus;
 
 namespace ModManagerUI.Components.ModCard
 {
@@ -14,6 +12,8 @@ namespace ModManagerUI.Components.ModCard
     {
         private readonly Button _root;
         private readonly Mod _mod;
+        
+        private Func<string> _valueGetter = null!;
         
         public DownloadButton(Button root, Mod mod)
         {
@@ -23,18 +23,8 @@ namespace ModManagerUI.Components.ModCard
 
         public void Initialize()
         {
-            EventBus.Instance.Register(this);
-            _root.clicked += async () =>
-            {
-                Disable();
-                await InstallController.DownloadAndExtractWithDependencies(_mod);
-            };
-            Refresh();
-        }
-
-        [OnEvent]
-        public void OnUpdatableModsRetrieved(UpdatableModsRetrievedEvent updatableModsRetrievedEvent)
-        {
+            _valueGetter = () => Task.Run(TextGetter).Result;
+            _root.clicked += async () => await InstallController.DownloadAndExtractWithDependencies(_mod);
             Refresh();
         }
         
@@ -50,8 +40,9 @@ namespace ModManagerUI.Components.ModCard
 
         public void Refresh()
         {
-            _root.text = TextGetter();
-            if (_mod.Modfile == null)
+            _root.text = _valueGetter();
+            var isPopulatingModFile = _mod.Modfile == null;
+            if (isPopulatingModFile)
             {
                 _root.SetEnabled(false);
                 return;
@@ -59,22 +50,31 @@ namespace ModManagerUI.Components.ModCard
 
             if (InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest))
             {
-                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _mod.Modfile.Version);
+                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _mod.Modfile!.Version);
                 _root.SetEnabled(!isSameVersion);
             }
             else
             {
                 _root.SetEnabled(true);
+                
             }
         }
 
         private string TextGetter()
         {
-            if (UpdateableModRegistry.UpdateAvailable == null)
+            if (ModManagerUI.UiSystem.ModManagerPanel.CheckForHighestInsteadOfLive)
                 return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Download");
-            if (UpdateableModRegistry.UpdateAvailable.Values.Any(file => file.ModId == _mod.Id))
-                return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Update");
-            return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Download");
+
+            if (!InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest)) 
+                return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Download");
+
+            if (_mod.Modfile == null)
+                return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Download");
+
+            if (VersionComparer.IsSameVersion(_mod.Modfile.Version, manifest.Version))
+                return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Download");
+
+            return ModManagerUI.UiSystem.ModManagerPanel.Loc.T("Mods.Update");
         }
     }
 }

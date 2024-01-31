@@ -59,9 +59,37 @@ namespace ModManagerUI.Components.ModCard
         
         private void OnToggleValueChanged(ChangeEvent<bool> changeEvent, Mod mod)
         {
-            _root.SetValueWithoutNotify(EnableController.AllowedToChangeState(mod) ? changeEvent.newValue : _valueGetter());
-            EnableController.ChangeState(mod, changeEvent.newValue);
-            Refresh();
+            if (ModHelper.IsModManager(mod))
+            {
+                _root.SetValueWithoutNotify(_valueGetter());
+                ModManagerUIPlugin.Log.LogWarning("Disabling Mod Manager is not allowed.");
+                return;
+            }
+            
+            if (ModHelper.ContainsBepInEx(mod))
+            {
+                _root.SetValueWithoutNotify(_valueGetter());
+                ModManagerUIPlugin.Log.LogWarning("Disabling BepInEx is not allowed.");
+                return;
+            }
+            
+            ModManagerUI.UiSystem.ModManagerPanel.ModsWereChanged = true;
+            try
+            {
+                if (changeEvent.newValue)
+                {
+                    _addonService.Enable(mod.Id);
+                }
+                else
+                {
+                    _addonService.Disable(mod.Id);
+                }
+            }
+            catch (AddonException ex)
+            {
+                _root.SetValueWithoutNotify(changeEvent.previousValue);
+                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+            }
         }
     }
 }

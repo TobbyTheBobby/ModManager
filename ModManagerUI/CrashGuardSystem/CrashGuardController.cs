@@ -1,83 +1,64 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using ModManager.AddonEnableSystem;
 using ModManager.AddonSystem;
 using ModManager.LoggingSystem;
 using ModManager.MapSystem;
-using ModManagerUI.UiSystem;
-using Timberborn.ErrorReportingUI;
+using Timberborn.CoreUI;
 using Timberborn.SceneLoading;
-using Timberborn.SingletonSystem;
-using UnityEngine;
 using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 
 namespace ModManagerUI.CrashGuardSystem
 {
-    public class CrashGuardController : ILoadableSingleton
+    public class CrashGuardController
     {
+        public static IModManagerLogger ModManagerLogger;
+        
         private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
+        private readonly AddonEnablerService _addonEnablerService = AddonEnablerService.Instance;
+        private readonly IModManagerLogger _modManagerLogger;
+        private readonly CrashScreenBox _crashScreenBox;
+        private readonly DialogBoxShower _dialogBoxShower;
         private readonly SceneLoader _sceneLoader;
 
-        private static bool _crashGuardActive = true;
+        private static bool _hasPassedLoading;
 
         private CrashGuardController(
             SceneLoader sceneLoader, 
-            IModManagerLogger modManagerLogger)
+            CrashScreenBox crashScreenBox,
+            IModManagerLogger modManagerLogger,
+            DialogBoxShower dialogBoxShower)
         {
+            _modManagerLogger = modManagerLogger;
+            _crashScreenBox = crashScreenBox;
+            _dialogBoxShower = dialogBoxShower;
             _sceneLoader = sceneLoader;
             
-            _sceneLoader.SceneLoaded += OnSceneLoaded;
+            ModManagerLogger = modManagerLogger;
             
-            if (!CrashGuardSystemConfig.CrashGuardEnabled.Value) 
-                Disable();
-        }
-        
-        public void Load()
-        {
-            // Test
-            // throw new Exception();
+            _sceneLoader.SceneLoaded += OnSceneLoaded;
         }
 
-        public static void Disable()
-        {
-            if (!_crashGuardActive)
-                return;
-            ModManagerUIPlugin.Log.LogInfo("Crash Guard System is now disabled.");
-            _crashGuardActive = false;
-        }
-        
         private void OnSceneLoaded(object sender, EventArgs e)
         {
-            if (SceneManager.GetActiveScene().buildIndex != 2)
-                return;
-
-            if (!_crashGuardActive)
+            if (_hasPassedLoading || SceneManager.GetActiveScene().buildIndex != 2)
             {
-                CrashScreenPanelPatch.ShowCrashScreenPanel();
+                _hasPassedLoading = true;
                 return;
             }
 
-            var obj = new GameObject();
-            Object.Instantiate(obj);
-            obj.AddComponent<CrashScreenUpdater>();
-            
-            var crashScreenPanels = Resources.FindObjectsOfTypeAll<CrashScreenPanel>();
-            var crashScreenPanel = crashScreenPanels.First();
-            var uiDocument = crashScreenPanel._uiDocument;
-            var container = uiDocument.panelSettings.visualTree;
-            
-            var modIds = new List<uint>();
-            foreach (var manifest in _installedAddonRepository.All().OrderBy(manifest => manifest.ModName))
+            _modManagerLogger.LogWarning("IMPORTANT: it seems the game crashed while trying to load into the game. All mods are being disabled.");
+            DisableAllMods();
+            _sceneLoader.LoadScene(0, 0, null);
+        }
+        
+        private void DisableAllMods()
+        {
+            foreach (var manifest in _installedAddonRepository.All())
             {
                 if (manifest is MapManifest)
                     continue;
-                if (ModHelper.ContainsBepInEx(manifest) || ModHelper.IsModManager(manifest))
-                    continue;
-                modIds.Add(manifest.ModId);
+                _addonEnablerService.Disable(manifest);
             }
-            
-            container.Add(CrashScreenBox.Instance.Create(modIds));
         }
     }
 }

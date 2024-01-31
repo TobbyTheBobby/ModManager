@@ -10,12 +10,7 @@ namespace ModManagerUI.UiSystem
 
         public static ModCard? Get(Mod mod)
         {
-            return Get(mod.Id);
-        }
-        
-        public static ModCard? Get(uint modId)
-        {
-            return ModCards.FirstOrDefault(card => card.Mod.Id == modId);
+            return ModCards.FirstOrDefault(card => card.Mod.Id == mod.Id);
         }
     }
 }
