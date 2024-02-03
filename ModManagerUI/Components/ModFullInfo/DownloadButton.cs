@@ -1,6 +1,5 @@
 ﻿using Modio.Models;
 using ModManager.AddonSystem;
-using ModManager.ModIoSystem;
 using ModManager.VersionSystem;
 using ModManagerUI.UiSystem;
 using UnityEngine.UIElements;
@@ -23,11 +22,7 @@ namespace ModManagerUI.Components.ModFullInfo
         public static DownloadButton Create(Button root, Mod mod, ModFullInfoController modFullInfoController)
         {
             var downloadButton = new DownloadButton(root, mod, modFullInfoController);
-            root.clicked += () =>
-            {
-                root.SetEnabled(false);
-                downloadButton.Download();
-            };
+            root.clicked += () => downloadButton.Download();
             downloadButton.Refresh();
             return downloadButton;
         }
@@ -46,28 +41,8 @@ namespace ModManagerUI.Components.ModFullInfo
                 _root.SetEnabled(false);
                 return;
             }
-
-            if (!_mod.IsInstalled())
-            {
-                _root.SetEnabled(true);
-                return;
-            }
-
-            if (_modFullInfoController.CurrentFile == null)
-            {
-                _root.SetEnabled(true);
-                return;
-            }
             
-            if (InstalledAddonRepository.Instance.TryGet(_mod.Id, out var manifest))
-            {
-                var isSameVersion = VersionComparer.IsSameVersion(manifest.Version, _modFullInfoController.CurrentFile.Version);
-                _root.SetEnabled(!isSameVersion);
-            }
-            else
-            {
-                _root.SetEnabled(true);
-            }
+            _root.SetEnabled(!VersionComparer.IsSameVersion(_modFullInfoController.CurrentFile!.Version, _mod.Modfile.Version));
         }
 
         private string TextGetter()
