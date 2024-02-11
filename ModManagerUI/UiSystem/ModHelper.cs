@@ -31,5 +31,10 @@ namespace ModManagerUI.UiSystem
         {
             return manifest.ModId == ModManagerId;
         }
+        
+        public static bool IsModManager(Manifest manifest)
+        {
+            return manifest.ModId == 2541476;
+        }
     }
 }
