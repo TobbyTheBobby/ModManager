@@ -49,8 +49,6 @@ namespace ModManagerUI.UiSystem
 
         private static void ChangeState(uint modId, bool state)
         {
-            var modCard = ModCardRegistry.Get(modId);
-            modCard?.ModActionStarted();
             try
             {
                 if (state)
@@ -67,7 +65,6 @@ namespace ModManagerUI.UiSystem
             {
                 ModManagerUIPlugin.Log.LogWarning(ex.Message);
             }
-            modCard?.ModActionStopped();
         }
     }
 }
