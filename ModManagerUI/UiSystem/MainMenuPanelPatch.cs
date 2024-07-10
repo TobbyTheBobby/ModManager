@@ -8,11 +8,11 @@ namespace ModManagerUI.UiSystem
     [HarmonyPatch]
     public class MainMenuPanelPatch
     {
-        [HarmonyPatch(typeof(MainMenuPanel), "GetPanel")]
+        [HarmonyPatch(typeof(MainMenuPanel), "Load")]
         [HarmonyPostfix]
-        public static void MainMenuPanelPostfix(ref VisualElement __result)
+        public static void MainMenuPanelPostfix(ref VisualElement ____root)
         {
-            VisualElement root = __result.Query("MainMenuPanel");
+            VisualElement root = ____root.Query("MainMenuPanel");
             var button = new LocalizableButton
             {
                 text = "Mod browser"
