@@ -38,7 +38,7 @@ namespace ModManagerUI.Components.ModCard
                 else
                 {
                     _valueGetter = () => EnabledHelper.IsEnabled(_mod);
-                    _enabledGetter = () => UiSystem.ModManagerPanel.InstalledAddonRepository.Has(_mod.Id);
+                    _enabledGetter = () => EnabledHelper.CanBeEnabledOrDisabled(_mod) && UiSystem.ModManagerPanel.InstalledAddonRepository.Has(_mod.Id);
                     _visibilityGetter = _mod.IsInstalled;
                 }
                 _initialized = true;

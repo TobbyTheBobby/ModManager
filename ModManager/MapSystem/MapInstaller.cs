@@ -53,10 +53,8 @@ namespace ModManager.MapSystem
             }
 
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-
-            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
-
-            var manifest = new MapModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile, timberFileNames);
+            
+            var manifest = new MapModManagerManifest(installLocation, mod, mod.Modfile, timberFileNames);
             var manifests = _mapManifestFinder.Find()
                 .Select(a => (MapModManagerManifest)a)
                 .ToList();
@@ -78,7 +76,7 @@ namespace ModManager.MapSystem
 
             var manifestPath = Path.Combine(Paths.Maps, MapModManagerManifest.FileName);
             var manifests = _mapManifestFinder.Find().Select(a => (MapModManagerManifest)a).ToList();
-            manifests.Remove(manifests.Where(x => x.ModId == modManagerManifest.ModId).SingleOrDefault());
+            manifests.Remove(manifests.SingleOrDefault(x => x.ResourceId == modManagerManifest.ResourceId));
             _persistenceService.SaveObject(manifests, manifestPath);
 
             _installedAddonRepository.Remove(modManagerManifest.ResourceId);
@@ -121,10 +119,8 @@ namespace ModManager.MapSystem
             }
 
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            
-            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
-            
-            var manifest = new MapModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile, timberFileNames);
+         
+            var manifest = new MapModManagerManifest(installLocation, mod, mod.Modfile, timberFileNames);
             var manifests = _mapManifestFinder.Find()
                 .Where(a => a.ResourceId != mod.Id)
                 .Select(a => (MapModManagerManifest)a)

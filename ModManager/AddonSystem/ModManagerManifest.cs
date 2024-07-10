@@ -12,11 +12,10 @@ namespace ModManager.AddonSystem
             
         }
         
-        public ModManagerManifest(string installLocation, Mod mod, Timberborn.Modding.Mod? timberbornMod, File file)
+        public ModManagerManifest(string installLocation, Mod mod, File file)
         {
             RootPath = installLocation;
             FileId = file.Id;
-            ModId = timberbornMod?.Manifest.Id;
             ResourceId = mod.Id;
             Version = file.Version!;
         }
@@ -25,8 +24,6 @@ namespace ModManager.AddonSystem
         public string RootPath { get; set; } = null!;
 
         public uint FileId { get; set; }
-
-        public string? ModId { get; set; }
         
         public uint ResourceId { get; set; }
         

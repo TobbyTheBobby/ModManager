@@ -31,23 +31,10 @@ namespace ModManager.ModSystem
             if (!mod.Tags.Any(x => x.Name == "Mod"))
                 return false;
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            // _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
-            // var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
-            // var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
-            // _persistenceService.SaveObject(manifest, modManifestPath);
-            // _installedAddonRepository.Add(manifest);
-            //
-            // return true;
-            if (_modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod))
-            {
-                var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
-                var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
-                _persistenceService.SaveObject(manifest, modManifestPath);
-                _installedAddonRepository.Add(manifest);
-                return true;
-            }
-            
-            Debug.LogWarning($"Mod '{mod.Name}' does not contain valid manifest.json.");
+            var manifest = new ModManagerManifest(installLocation, mod, mod.Modfile!);
+            var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
+            _persistenceService.SaveObject(manifest, modManifestPath);
+            _installedAddonRepository.Add(manifest);
             return true;
         }
 
@@ -76,8 +63,7 @@ namespace ModManager.ModSystem
                 return false;
             mod.Modfile = file;
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
-            var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile);
+            var manifest = new ModManagerManifest(installLocation, mod, mod.Modfile);
             var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
 

@@ -21,5 +21,15 @@ namespace ModManagerUI.UiSystem
 
             return false;
         }
+        
+        public static bool CanBeEnabledOrDisabled(Mod mod)
+        {
+            if (InstalledAddonRepository.Instance.TryGet(mod.Id, out var modManagerManifest))
+            {
+                return ModManagerPanel.ModLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(modManagerManifest.RootPath), true, "Local"), out _);
+            }
+
+            return false;
+        }
     }
 }

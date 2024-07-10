@@ -10,8 +10,8 @@ namespace ModManager.MapSystem
 
         public List<string> MapFileNames { get; }
 
-        public MapModManagerManifest(string installLocation, Mod mod, Timberborn.Modding.Mod timberbornMod, File file, List<string> mapFleNames) 
-            : base(installLocation, mod, timberbornMod, file)
+        public MapModManagerManifest(string installLocation, Mod mod, File file, List<string> mapFleNames) 
+            : base(installLocation, mod, file)
         {
             MapFileNames = mapFleNames;
         }
