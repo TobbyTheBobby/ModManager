@@ -11,6 +11,7 @@ Mods.Tags.All,All,Tag-Option zum Anzeigen aller Mods and Karten. Kurz halten. Is
 Mods.Votes,Bewertung:,Label vor der Anzahl der Likes und Dislikes.
 Mods.ModsChanged,Änderungen an Mods werden erst nach einem Neustart wirksam,"Hinweis auf den Dialog für den Benutzer zum Neustart des Spiels, nachdem Änderungen an Mods vorgenommen wurden"
 Mods.Quit,Beenden,Beendet das Spiel
+Mods.Restart,Neustart,Started das Spiel neu
 Mods.Stay,Zurück,Zurück zum Hauptmenü
 Mods.Enabled,Aktiviert,Schalter zum aktivieren/deaktivieren von Mods. Kurz halten.
 Mods.Installed,Installiert,Schalter zum installieren/deinstallieren von Mods. Kurz halten.
@@ -25,11 +26,15 @@ Mods.TopRated,Top bewertet,Sortiert die am besten bewerteten Mods zuerst.
 Mods.LastUpdated,Zuletzt aktualisiert,Sortiert die als letztet aktualisierten Mods zuerst.
 Mods.UpdateAllLabel,Es sind {0} Aktualisierungen verfügbar.,Label zur Information für wie viele Mods Aktualisierungen verfügbar sind.
 Mods.UpdateAll,Alle aktualisieren,Aktualisiert alle Mods für die ein Update zur Verfügung steht. Kurz halten.
-Mods.Empty,,Leerer String
+Mods.Empty, ,Leerer String
 Mods.Update,Aktualisieren,Aktualisiert die Mod. Kurz halten.
 Mods.Versions,Verfügbare Versionen,Label der Liste aller auf mod.io verfügbaren Versionen der Mod
-Mods.UpdateBehaviour,Suche nach der höchsten statt der aktuellen Version
-Mods.UpdateBehaviourTooltip,"Normalerweise ist die \u201Eaktuelle Version\u201C die Version, die im Stable-Branch funktioniert. Einige Modder pushen höhere Versionen, die normalerweise nur auf dem Experimental-Branch funktionieren."
+Mods.UpdateBehaviour,Suche nach der höchsten statt der aktuellen Version,-
+Mods.UpdateBehaviourTooltip,"Normalerweise ist die \u201Eaktuelle Version\u201C die Version, die im Stable-Branch funktioniert. Einige Modder pushen höhere Versionen, die normalerweise nur auf dem Experimental-Branch funktionieren.",-
 Mods.VersionUnknown,"Anhand der Mod-Dateien ist es derzeit unklar, ob die Mod mit der aktuellen Spielversion funktioniert.",-
 Mods.VersionCompatible,"Anhand der Mod-Dateien wurde eine Version gefunden, die mit der aktuellen Spielversion kompatibel ist.",-
 Mods.VersionIncompatible,"Anhand der Mod-Dateien wurden keine Versionen gefunden, die mit der aktuellen Spielversion kompatibel sind. Die Installation wird nicht empfohlen.",-
+Mods.CrashInfo,"Es scheint, dass das Spiel beim Versuch zu laden, abgestürzt ist. Unten können Sie auswählen, welche Mods Sie deaktivieren möchten, um einen Absturz beim nächsten Mal zu verhindern.",-
+Mods.EnableAll,Aktiviere alle Mods,-
+Mods.DisableAll,Deaktiviere alle Mods,-
+Mods.GoToCrashReport,"Gehe zum Crash-Report",-
