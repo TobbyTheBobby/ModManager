@@ -17,9 +17,7 @@ namespace ModManager.ModSystem
         {
             extractLocation = "";
             if (!modInfo.Tags.Any(x => x.Name == "Mod"))
-            {
                 return false;
-            }
 
             var modFolderName = $"{modInfo.NameId}_{modInfo.Id}";
             ClearOldModFiles(modInfo, modFolderName);
@@ -111,11 +109,15 @@ namespace ModManager.ModSystem
         {
             using (var archive = ZipFile.OpenRead(zipFilePath))
             {
-                foreach (var entry in archive.Entries)
+                var entry = archive.Entries.FirstOrDefault(entry => entry.FullName.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase));
+
+                if (entry != null)
                 {
-                    if (!entry.FullName.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase)) 
-                        continue;
-                    var folderPath = Path.GetDirectoryName(entry.FullName) + "/";
+                    string folderPath;
+                    if (string.IsNullOrEmpty(Path.GetDirectoryName(entry.FullName)))
+                        folderPath = "";
+                    else
+                        folderPath = Path.GetDirectoryName(entry.FullName) + "/";
 
                     foreach (var e in archive.Entries)
                     {
@@ -135,10 +137,11 @@ namespace ModManager.ModSystem
                             e.ExtractToFile(destinationPath, overwrite: true);
                         }
                     }
-                    return;
                 }
-                
-                ZipFile.ExtractToDirectory(zipFilePath, extractPath, overWrite);
+                else
+                {
+                    ZipFile.ExtractToDirectory(zipFilePath, extractPath, overWrite);
+                }
             }
             
             // using (var archive = ZipFile.OpenRead(zipFilePath))

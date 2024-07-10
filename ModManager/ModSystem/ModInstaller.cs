@@ -7,6 +7,7 @@ using ModManager.ExtractorSystem;
 using ModManager.MapSystem;
 using ModManager.PersistenceSystem;
 using Timberborn.Modding;
+using UnityEngine;
 using Mod = Modio.Models.Mod;
 
 namespace ModManager.ModSystem
@@ -30,12 +31,23 @@ namespace ModManager.ModSystem
             if (!mod.Tags.Any(x => x.Name == "Mod"))
                 return false;
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
-            var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
-            var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
-            _persistenceService.SaveObject(manifest, modManifestPath);
-            _installedAddonRepository.Add(manifest);
-
+            // _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
+            // var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
+            // var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
+            // _persistenceService.SaveObject(manifest, modManifestPath);
+            // _installedAddonRepository.Add(manifest);
+            //
+            // return true;
+            if (_modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod))
+            {
+                var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
+                var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
+                _persistenceService.SaveObject(manifest, modManifestPath);
+                _installedAddonRepository.Add(manifest);
+                return true;
+            }
+            
+            Debug.LogWarning($"Mod '{mod.Name}' does not contain valid manifest.json.");
             return true;
         }
 
