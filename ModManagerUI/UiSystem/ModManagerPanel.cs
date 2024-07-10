@@ -110,6 +110,11 @@ namespace ModManagerUI.UiSystem
             var asset = AssetLoader.Load<VisualTreeAsset>(ModesBoxUxmlPath);
             _root = LoadVisualElement(asset);
 
+            var modsBox = _root.Q<VisualElement>("ModsBox");
+            modsBox.style.marginBottom = new Length(1, LengthUnit.Percent);
+            modsBox.style.marginTop = new Length(1, LengthUnit.Percent);
+            _root.Q<NineSliceVisualElement>().style.flexGrow = 0;
+
             _modsRoot = ModsScrollView.Create(_root.Q<ScrollView>("Mods"));
             _loading = _root.Q<Label>("Loading");
             _error = _root.Q<Label>("Error");
