@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using Timberborn.CoreUI;
-using Timberborn.MainMenuScene;
+using Timberborn.MainMenuPanels;
 using UnityEngine.UIElements;
 
 namespace ModManagerUI.UiSystem
@@ -15,9 +15,10 @@ namespace ModManagerUI.UiSystem
             VisualElement root = __result.Query("MainMenuPanel");
             var button = new LocalizableButton
             {
-                classList = {"menu-button", "menu-button--stretched" }, 
-                text = "Mod manager"
+                text = "Mod browser"
             };
+            button.AddToClassList("menu-button");
+            button.AddToClassList("menu-button--stretched");
             button.clicked += () => ModManagerPanel.Instance.OpenOptionsDelegate();
             root.Insert(7, button);
         }

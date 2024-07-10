@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.IO;
 using ModManager.StartupSystem;
+using Timberborn.PlatformUtilities;
 
 namespace ModManager
 {
@@ -33,7 +32,7 @@ namespace ModManager
 
         public static string Mods { get; set; } = null!;
 
-        public static readonly string Maps = Path.Combine(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Documents", "Timberborn") : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Timberborn"), "Maps");
+        public static readonly string Maps = Path.Combine(UserDataFolder.Folder, "Maps");
 
         public static class ModManager
         {

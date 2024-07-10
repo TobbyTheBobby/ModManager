@@ -1,22 +1,31 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using ModManager.ManifestLocationFinderSystem;
-using ModManager.StartupSystem;
+using Timberborn.Modding;
+using Timberborn.SingletonSystem;
 
 namespace ModManager.AddonSystem
 {
-    public class InstalledAddonRepository : Singleton<InstalledAddonRepository>, ILoadable
+    public class InstalledAddonRepository : ILoadableSingleton
     {
-        private Dictionary<uint, Manifest> _installedMods = new();
+        public static InstalledAddonRepository Instance = null!;
+        
+        private readonly ManifestLocationFinderService _manifestLocationFinderService;
+        
+        private Dictionary<uint, ModManagerManifest> _installedMods = new();
 
-        private readonly ManifestLocationFinderService _manifestLocationFinderService = ManifestLocationFinderService.Instance;
-
-        public bool TryGet(uint modId, out Manifest manifest)
+        public InstalledAddonRepository(ManifestLocationFinderService manifestLocationFinderService)
         {
-            return _installedMods.TryGetValue(modId, out manifest);
+            Instance = this;
+            _manifestLocationFinderService = manifestLocationFinderService;
         }
 
-        public Manifest Get(uint modId)
+        public bool TryGet(uint modId, out ModManagerManifest modManagerManifest)
+        {
+            return _installedMods.TryGetValue(modId, out modManagerManifest);
+        }
+
+        public ModManagerManifest Get(uint modId)
         {
             return _installedMods[modId];
         }
@@ -31,19 +40,19 @@ namespace ModManager.AddonSystem
             _installedMods.Remove(modId);
         }
 
-        public void Add(Manifest manifest)
+        public void Add(ModManagerManifest modManagerManifest)
         {
-            _installedMods.Add(manifest.ModId, manifest);
+            _installedMods.Add(modManagerManifest.ResourceId, modManagerManifest);
         }
 
-        public IEnumerable<Manifest> All()
+        public IEnumerable<ModManagerManifest> All()
         {
             return _installedMods.Values;
         }
 
-        public void Load(ModManagerStartupOptions startupOptions)
+        public void Load()
         {
-            _installedMods = _manifestLocationFinderService.FindAll().ToDictionary(manifest => manifest.ModId);
+            _installedMods = _manifestLocationFinderService.FindAll().ToDictionary(manifest => manifest.ResourceId);
         }
     }
 }

@@ -7,6 +7,7 @@ using ModManager.AddonSystem;
 using ModManager.VersionSystem;
 using ModManagerUI.EventSystem;
 using Timberborn.SingletonSystem;
+using UnityEngine;
 using EventBus = ModManagerUI.EventSystem.EventBus;
 
 namespace ModManagerUI.UiSystem
@@ -29,7 +30,7 @@ namespace ModManagerUI.UiSystem
             }
             catch (OperationCanceledException ex)
             {
-                ModManagerUIPlugin.Log.LogDebug($"Async operation was cancelled: {ex.Message}");
+                Debug.Log($"Async operation was cancelled: {ex.Message}");
             }
             catch (Exception exception)
             {
@@ -50,7 +51,7 @@ namespace ModManagerUI.UiSystem
                 File? file;
                 try
                 {
-                    file = await AddonService.Instance.TryGetCompatibleVersion(manifest.ModId, ModManagerPanel.CheckForHighestInsteadOfLive);
+                    file = await AddonService.Instance.TryGetCompatibleVersion(manifest.ResourceId, ModManagerPanel.CheckForHighestInsteadOfLive);
                 }
                 catch (Exception)
                 {

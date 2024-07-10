@@ -1,0 +1,11 @@
+{
+  "Name": "Mod Manager",
+  "Version": "3",
+  "Id": "ModManager",
+  "MinimumGameVersion": "0.6.0.0",
+  "Description": "The very first mod manager",
+  "RequiredMods": [{
+    "Id": "Harmony",
+    "MinimumVersion": "2.3.3"
+  }]
+}

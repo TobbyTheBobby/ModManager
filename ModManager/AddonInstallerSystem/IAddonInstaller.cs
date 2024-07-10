@@ -7,7 +7,7 @@ namespace ModManager.AddonInstallerSystem
     {
         public bool Install(Mod mod, string zipLocation);
 
-        public bool Uninstall(Manifest manifest);
+        public bool Uninstall(ModManagerManifest modManagerManifest);
 
         public bool ChangeVersion(Mod mod, File file, string zipLocation);
     }

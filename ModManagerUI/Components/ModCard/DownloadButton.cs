@@ -24,11 +24,7 @@ namespace ModManagerUI.Components.ModCard
         public void Initialize()
         {
             EventBus.Instance.Register(this);
-            _root.clicked += async () =>
-            {
-                Disable();
-                await InstallController.DownloadAndExtractWithDependencies(_mod);
-            };
+            _root.clicked += OnClick;
             Refresh();
         }
 
@@ -51,7 +47,7 @@ namespace ModManagerUI.Components.ModCard
         public void Refresh()
         {
             _root.text = TextGetter();
-            if (_mod.Modfile == null)
+            if (ModHelper.IsModManager(_mod) || _mod.Modfile == null)
             {
                 _root.SetEnabled(false);
                 return;
@@ -66,6 +62,12 @@ namespace ModManagerUI.Components.ModCard
             {
                 _root.SetEnabled(true);
             }
+        }
+
+        private async void OnClick()
+        {
+            Disable();
+            await InstallController.DownloadAndExtractWithDependencies(_mod);
         }
 
         private string TextGetter()

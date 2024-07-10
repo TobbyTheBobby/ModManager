@@ -1,41 +1,51 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Modio.Models;
 using ModManager.AddonInstallerSystem;
 using ModManager.AddonSystem;
 using ModManager.ExtractorSystem;
 using ModManager.MapSystem;
 using ModManager.PersistenceSystem;
+using Timberborn.Modding;
+using Mod = Modio.Models.Mod;
 
 namespace ModManager.ModSystem
 {
     public class ModInstaller : IAddonInstaller
     {
-        private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
+        private readonly InstalledAddonRepository _installedAddonRepository;
+        private readonly ModLoader _modLoader;
+
         private readonly AddonExtractorService _addonExtractorService = AddonExtractorService.Instance;
         private readonly PersistenceService _persistenceService = PersistenceService.Instance;
+
+        public ModInstaller(InstalledAddonRepository installedAddonRepository, ModLoader modLoader)
+        {
+            _installedAddonRepository = installedAddonRepository;
+            _modLoader = modLoader;
+        }
 
         public bool Install(Mod mod, string zipLocation)
         {
             if (!mod.Tags.Any(x => x.Name == "Mod"))
                 return false;
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            var manifest = new Manifest(mod, mod.Modfile!, installLocation);
-            var modManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
+            var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile!);
+            var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
             _installedAddonRepository.Add(manifest);
 
             return true;
         }
 
-        public bool Uninstall(Manifest manifest)
+        public bool Uninstall(ModManagerManifest modManagerManifest)
         {
-            if (manifest is not Manifest && manifest is MapManifest)
+            if (modManagerManifest is not ModManagerManifest && modManagerManifest is MapModManagerManifest)
                 return false;
-            _installedAddonRepository.Remove(manifest.ModId);
+            _installedAddonRepository.Remove(modManagerManifest.ResourceId);
 
-            var modDirInfo = new DirectoryInfo(Path.Combine(manifest.RootPath));
+            var modDirInfo = new DirectoryInfo(Path.Combine(modManagerManifest.RootPath));
             var modSubFolders = modDirInfo.GetDirectories("*", SearchOption.AllDirectories);
             foreach (var subDirectory in modSubFolders.Reverse())
             {
@@ -52,10 +62,11 @@ namespace ModManager.ModSystem
         {
             if (!mod.Tags.Any(x => x.Name == "Mod"))
                 return false;
-            mod.Modfile= file;
+            mod.Modfile = file;
             var installLocation = _addonExtractorService.Extract(mod, zipLocation);
-            var manifest = new Manifest(mod, mod.Modfile, installLocation);
-            var modManifestPath = Path.Combine(installLocation, Manifest.FileName);
+            _modLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(installLocation), true, "Local"), out var timberbornMod);
+            var manifest = new ModManagerManifest(installLocation, mod, timberbornMod, mod.Modfile);
+            var modManifestPath = Path.Combine(installLocation, ModManagerManifest.FileName);
             _persistenceService.SaveObject(manifest, modManifestPath);
 
             _installedAddonRepository.Remove(mod.Id);
@@ -73,11 +84,11 @@ namespace ModManager.ModSystem
                 {
                     file.Delete();
                 }
-                catch(UnauthorizedAccessException ex)
+                catch (UnauthorizedAccessException ex)
                 {
                     file.MoveTo($"{file.FullName}{Names.Extensions.Remove}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }

@@ -1,30 +1,19 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace ModManager.ManifestLocationFinderSystem
 {
-    public class ManifestLocationFinderRegistry : Singleton<ManifestLocationFinderRegistry>
+    public class ManifestLocationFinderRegistry
     {
-        private readonly List<KeyValuePair<string, IManifestLocationFinder>> _manifestLocationFinders = new();
+        private readonly IEnumerable<IManifestLocationFinder> _manifestLocationFinders;
 
-        public void Add(string manifestLocationFinderId, IManifestLocationFinder manifestLocationFinder)
+        public ManifestLocationFinderRegistry(IEnumerable<IManifestLocationFinder> manifestLocationFinders)
         {
-            if (_manifestLocationFinders.Exists(pair => pair.Key.Equals(manifestLocationFinderId)))
-            {
-                throw new ManifestException($"Manifest location finder with id: `{manifestLocationFinderId}` is already added to the list");
-            }
-
-            _manifestLocationFinders.Insert(0, new KeyValuePair<string, IManifestLocationFinder>(manifestLocationFinderId, manifestLocationFinder));
-        }
-
-        public void Remove(string manifestLocationFinderId)
-        {
-            _manifestLocationFinders.Remove(_manifestLocationFinders.First(pair => pair.Key.Equals(manifestLocationFinderId)));
+            _manifestLocationFinders = manifestLocationFinders;
         }
 
         public IEnumerable<IManifestLocationFinder> GetManifestLocationFinders()
         {
-            return _manifestLocationFinders.Select(pair => pair.Value);
+            return _manifestLocationFinders;
         }
     }
 }

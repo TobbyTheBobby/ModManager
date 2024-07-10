@@ -5,16 +5,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
+using ModManager.StartupSystem;
 
 namespace ModManager.ModManagerSystem
 {
-    public class ModManagerExtractor : IAddonExtractor
+    public class ModManagerExtractor : Singleton<ModManagerExtractor>, IAddonExtractor, ILoadable
     {
-        private string _modManagerFolderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        private string _modManagerFolderPath;
         private const string _modManagerPackageName = "Mod Manager";
         private List<string> _foldersToIgnore = new() { "temp" };
-
+        
+        public void Load(ModManagerStartupOptions startupOptions)
+        {
+            _modManagerFolderPath = startupOptions.ModManagerPath;
+        }
+        
         public bool Extract(string addonZipLocation, Mod modInfo, out string extractLocation, bool overWrite = true)
         {
             extractLocation = "";

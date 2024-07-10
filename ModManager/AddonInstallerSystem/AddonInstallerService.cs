@@ -1,11 +1,20 @@
 ﻿using Modio.Models;
 using ModManager.AddonSystem;
+using Timberborn.Modding;
+using Mod = Modio.Models.Mod;
 
 namespace ModManager.AddonInstallerSystem
 {
-    public class AddonInstallerService : Singleton<AddonInstallerService>
+    public class AddonInstallerService
     {
         private readonly AddonInstallerRegistry _addonInstallerRegistry = AddonInstallerRegistry.Instance;
+
+        private readonly ModRepository _modRepository;
+
+        public AddonInstallerService(ModRepository modRepository)
+        {
+            _modRepository = modRepository;
+        }
 
         public void Install(Mod mod, string zipLocation)
         {
@@ -13,6 +22,8 @@ namespace ModManager.AddonInstallerSystem
             {
                 if (installer.Install(mod, zipLocation))
                 {
+                    _modRepository.Load();
+                    
                     return;
                 }
             }
@@ -20,17 +31,19 @@ namespace ModManager.AddonInstallerSystem
             throw new AddonInstallerException($"{mod.Name} could not be installed by any installer");
         }
 
-        public void Uninstall(Manifest manifest)
+        public void Uninstall(ModManagerManifest modManagerManifest)
         {
             foreach (var installer in _addonInstallerRegistry.GetAddonInstallers())
             {
-                if (installer.Uninstall(manifest))
+                if (installer.Uninstall(modManagerManifest))
                 {
+                    _modRepository.Load();
+                    
                     return;
                 }
             }
 
-            throw new AddonInstallerException($"{manifest.ModName} could not be uninstalled by any installer");
+            throw new AddonInstallerException($"{modManagerManifest.ModName} could not be uninstalled by any installer");
         }
 
         public void ChangeVersion(Mod mod, File file, string zipLocation)
@@ -39,6 +52,8 @@ namespace ModManager.AddonInstallerSystem
             {
                 if (installer.ChangeVersion(mod, file, zipLocation))
                 {
+                    _modRepository.Load();
+                    
                     return;
                 }
             }

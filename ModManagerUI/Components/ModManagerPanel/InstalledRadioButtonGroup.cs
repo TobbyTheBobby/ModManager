@@ -22,11 +22,11 @@ namespace ModManagerUI.Components.ModManagerPanel
             switch (installedOptions)
             {
                 case InstalledOptions.Installed:
-                    var installedModNames = InstalledAddonRepository.Instance.All().Select(manifest => manifest.ModId).ToList();
+                    var installedModNames = InstalledAddonRepository.Instance.All().Select(manifest => manifest.ResourceId).ToList();
                     return installedModNames;
                 case InstalledOptions.Uninstalled:
                     isNotList = true;
-                    var uninstalledModNames = InstalledAddonRepository.Instance.All().Select(manifest => manifest.ModId).ToList();
+                    var uninstalledModNames = InstalledAddonRepository.Instance.All().Select(manifest => manifest.ResourceId).ToList();
                     return uninstalledModNames;
                 case InstalledOptions.UpdateAvailable:
                     if (UpdateableModRegistry.UpdateAvailable == null)

@@ -39,8 +39,8 @@ namespace ModManagerUI.UiSystem
 
         public static ModCard Create(Mod mod)
         {
-            var assetName = "assets/resources/ui/views/mods/modsboxitem.uxml";
-            var asset = AssetBundleLoader.AssetBundle.LoadAsset<VisualTreeAsset>(assetName);
+            var assetName = "ui/views/mods/modsboxitem";
+            var asset = ModManagerPanel.AssetLoader.Load<VisualTreeAsset>(assetName);
             var root = ModManagerPanel.VisualElementLoader.LoadVisualElement(asset);
             
             root.Q<Label>("Name").text = mod.Name;

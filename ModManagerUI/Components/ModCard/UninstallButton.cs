@@ -30,7 +30,7 @@ namespace ModManagerUI.Components.ModCard
 
         private bool IsVisible()
         {
-            if (ModHelper.ContainsBepInEx(_mod) || ModHelper.IsModManager(_mod))
+            if (ModHelper.IsModManager(_mod))
             {
                 return true;
             }
@@ -40,7 +40,7 @@ namespace ModManagerUI.Components.ModCard
 
         private bool IsEnabled()
         {
-            if (ModHelper.ContainsBepInEx(_mod) || ModHelper.IsModManager(_mod))
+            if (ModHelper.IsModManager(_mod))
             {
                 return false;
             }

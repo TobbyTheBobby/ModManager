@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using ModManager.AddonSystem;
-using ModManager.BepInExSystem;
-using ModManager.MapSystem;
 using ModManager.ModIoSystem;
 using ModManager.ModManagerSystem;
-using ModManager.ModSystem;
 
 namespace ModManager.StartupSystem
 {
@@ -17,13 +13,9 @@ namespace ModManager.StartupSystem
         {
             Paths.Instance,
             ModIoGameInfo.Instance,
-            ModRegisterer.Instance,
-            MapRegisterer.Instance,
-            BepInExRegisterer.Instance,
             ModManagerRegisterer.Instance,
-
-            InstalledAddonRepository.Instance,
-            RemoveFilesOnStartup.Instance
+            
+            ModManagerExtractor.Instance
         };
 
         public static void Run(string apiKey, Action<ModManagerStartupOptions> options)

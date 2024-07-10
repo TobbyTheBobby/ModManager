@@ -4,35 +4,42 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Modio.Filters;
-using Modio.Models;
 using ModManager.AddonSystem;
 using ModManager.ManifestValidatorSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI.Components.ModManagerPanel;
 using ModManagerUI.EventSystem;
+using Timberborn.AssetSystem;
 using Timberborn.CoreUI;
 using Timberborn.ExperimentalModeSystem;
 using Timberborn.Localization;
+using Timberborn.Modding;
 using Timberborn.SingletonSystem;
 using Timberborn.TooltipSystem;
+using UnityEngine;
 using UnityEngine.UIElements;
 using EventBus = ModManagerUI.EventSystem.EventBus;
 using Image = UnityEngine.UIElements.Image;
+using Mod = Modio.Models.Mod;
 using TextField = UnityEngine.UIElements.TextField;
 
 namespace ModManagerUI.UiSystem
 {
     public class ModManagerPanel : IPanelController, ILoadableSingleton, IUpdatableSingleton
     {
-        private static readonly string ModesBoxUxmlPath = "assets/resources/ui/views/mods/modsbox.uxml";
+        private static readonly string ModesBoxUxmlPath = "ui/views/mods/modsbox";
         
         public static bool CheckForHighestInsteadOfLive;
         public static bool ModsWereChanged = false;
         
+        public static InstalledAddonRepository InstalledAddonRepository = null!;
         public static ModFullInfoController ModFullInfoController = null!;
         public static VisualElementLoader VisualElementLoader = null!;
         public static ITooltipRegistrar TooltipRegistrar = null!;
+        public static ModRepository ModRepository = null!;
+        public static IAssetLoader AssetLoader = null!;
         public static PanelStack PanelStack = null!;
+        public static ModLoader ModLoader = null!;
         public static ILoc Loc = null!;
         
         private readonly VisualElementInitializer _visualElementInitializer;
@@ -66,17 +73,25 @@ namespace ModManagerUI.UiSystem
         public ModManagerPanel(
             ModFullInfoController modFullInfoController,
             ITooltipRegistrar tooltipRegistrar,
+            ModRepository modRepository,
+            IAssetLoader assetLoader,
             PanelStack panelStack,
+            ModLoader modLoader,
             ILoc loc,
             
             VisualElementInitializer visualElementInitializer,
+            InstalledAddonRepository? installedAddonRepository,
             VisualElementLoader visualElementLoader,
             ExperimentalMode experimentalMode,
             DialogBoxShower dialogBoxShower)
         {
+            InstalledAddonRepository = installedAddonRepository;
             ModFullInfoController = modFullInfoController;
             TooltipRegistrar = tooltipRegistrar;
+            ModRepository = modRepository;
+            AssetLoader = assetLoader;
             PanelStack = panelStack;
+            ModLoader = modLoader;
             Loc = loc;
             
             _visualElementInitializer = visualElementInitializer;
@@ -91,8 +106,8 @@ namespace ModManagerUI.UiSystem
         {
             OpenOptionsDelegate = OpenOptionsPanel;
             CheckForHighestInsteadOfLive = _experimentalMode.IsExperimental;
-            
-            var asset = AssetBundleLoader.AssetBundle.LoadAsset<VisualTreeAsset>(ModesBoxUxmlPath);
+
+            var asset = AssetLoader.Load<VisualTreeAsset>(ModesBoxUxmlPath);
             _root = LoadVisualElement(asset);
 
             _modsRoot = ModsScrollView.Create(_root.Q<ScrollView>("Mods"));
@@ -118,9 +133,9 @@ namespace ModManagerUI.UiSystem
             SortingButtonsManager.AddNew(_root.Q<Button>("LastUpdated"), "LastUpdated", ModFilter.DateUpdated.Desc());
 
             var enableAll = _root.Q<Button>("EnableAll");
-            enableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, true)));
+            enableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, true)));
             var disableAll = _root.Q<Button>("DisableAll");
-            disableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.Instance.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, false)));
+            disableAll.RegisterCallback<ClickEvent>(_ => InstalledAddonRepository.All().ToList().ForEach(manifest => EnableController.ChangeState(manifest, false)));
             
             _updateAll = UpdateAllWrapper.Create(_root.Q<VisualElement>("UpdateAllWrapper"), () => UpdateableModRegistry.UpdateAvailable!);
             
@@ -227,12 +242,12 @@ namespace ModManagerUI.UiSystem
             }
             catch (OperationCanceledException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning($"Async operation was cancelled: {ex.Message}");
+                Debug.LogWarning($"Async operation was cancelled: {ex.Message}");
             }
             catch (Exception e)
             {
-                ModManagerUIPlugin.Log.LogError(e.Message);
-                ModManagerUIPlugin.Log.LogError(e.StackTrace);
+                Debug.LogError(e.Message);
+                Debug.LogError(e.StackTrace);
                 ShowError(e);
             }
         }
@@ -260,7 +275,7 @@ namespace ModManagerUI.UiSystem
             }
             catch (OperationCanceledException ex)
             {
-                ModManagerUIPlugin.Log.LogDebug($"Async operation was cancelled: {ex.Message}");
+                Debug.Log($"Async operation was cancelled: {ex.Message}");
             }
         }
 

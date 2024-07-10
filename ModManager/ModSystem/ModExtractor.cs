@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using File = System.IO.File;
 
 namespace ModManager.ModSystem
 {
@@ -19,12 +20,12 @@ namespace ModManager.ModSystem
             {
                 return false;
             }
-            var modFolderName = $"{modInfo.NameId}_{modInfo.Id}_{modInfo.Modfile.Version}";
+
+            var modFolderName = $"{modInfo.NameId}_{modInfo.Id}";
             ClearOldModFiles(modInfo, modFolderName);
             extractLocation = Path.Combine(Paths.Mods, modFolderName);
-            ZipFile.ExtractToDirectory(addonZipLocation, extractLocation, overWrite);
-            System.IO.File.Delete(addonZipLocation);
-
+            ExtractContent(addonZipLocation, extractLocation, overWrite);
+            File.Delete(addonZipLocation);
             return true;
         }
 
@@ -32,15 +33,17 @@ namespace ModManager.ModSystem
         {
             if (TryGetExistingModFolder(modInfo, out var dirs))
             {
-                var dirInfo = new DirectoryInfo(dirs);
-                if (dirInfo.Name.Equals(modFolderName))
+                var directoryInfo = new DirectoryInfo(dirs);
+                if (directoryInfo.Name.Equals(modFolderName))
                 {
                     return;
                 }
-                dirInfo.MoveTo(Path.Combine(Paths.Mods, modFolderName));
+
+                directoryInfo.MoveTo(Path.Combine(Paths.Mods, modFolderName));
                 DeleteModFiles(modFolderName);
             }
         }
+
         private bool TryGetExistingModFolder(Mod modInfo, out string dirs)
         {
             dirs = null;
@@ -60,7 +63,7 @@ namespace ModManager.ModSystem
 
             return false;
         }
-        
+
         private void DeleteModFiles(string modFolderName)
         {
             var modDirInfo = new DirectoryInfo(Path.Combine(Paths.Mods, modFolderName));
@@ -102,6 +105,78 @@ namespace ModManager.ModSystem
             {
                 dir.Delete();
             }
+        }
+
+        private static void ExtractContent(string zipFilePath, string extractPath, bool overWrite)
+        {
+            using (var archive = ZipFile.OpenRead(zipFilePath))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    if (!entry.FullName.EndsWith("manifest.json", StringComparison.OrdinalIgnoreCase)) 
+                        continue;
+                    var folderPath = Path.GetDirectoryName(entry.FullName) + "/";
+
+                    foreach (var e in archive.Entries)
+                    {
+                        if (!e.FullName.StartsWith(folderPath, StringComparison.OrdinalIgnoreCase)) 
+                            continue;
+                        var relativePath = e.FullName.Substring(folderPath.Length);
+                        var destinationPath = Path.GetFullPath(Path.Combine(extractPath, relativePath));
+
+                        Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
+
+                        if (e.Name == "")
+                        {
+                            Directory.CreateDirectory(destinationPath);
+                        }
+                        else
+                        {
+                            e.ExtractToFile(destinationPath, overwrite: true);
+                        }
+                    }
+                    return;
+                }
+                
+                ZipFile.ExtractToDirectory(zipFilePath, extractPath, overWrite);
+            }
+            
+            // using (var archive = ZipFile.OpenRead(zipFilePath))
+            // {
+            //     var rootEntries = archive.Entries.Where(entry => entry.FullName.EndsWith('/')).Where(e => e.FullName.Count(c => c == '/') <= 1).ToList();
+            //     if (rootEntries.Count != 1)
+            //     {
+            //         ZipFile.ExtractToDirectory(zipFilePath, extractPath, overWrite);
+            //         return;
+            //     }
+            //     
+            //     var rootEntry = rootEntries[0];
+            //     if (!rootEntry.FullName.EndsWith("/")) 
+            //     {
+            //         ZipFile.ExtractToDirectory(zipFilePath, extractPath, overWrite);
+            //         return;
+            //     }
+            //
+            //     var rootFolderName = rootEntry.FullName;
+            //
+            //     Directory.CreateDirectory(extractPath);
+            //
+            //     foreach (var entry in archive.Entries)
+            //     {
+            //         if (!entry.FullName.StartsWith(rootFolderName) || entry.FullName == rootFolderName) 
+            //             continue;
+            //         var destinationPath = Path.Combine(extractPath, entry.FullName.Substring(rootFolderName.Length));
+            //         if (entry.FullName.EndsWith("/"))
+            //         {
+            //             Directory.CreateDirectory(destinationPath);
+            //         }
+            //         else
+            //         {
+            //             Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
+            //             entry.ExtractToFile(destinationPath, overwrite: true);
+            //         }
+            //     }
+            // }
         }
     }
 }

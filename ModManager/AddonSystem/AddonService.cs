@@ -1,6 +1,4 @@
 ﻿using Modio.Models;
-using ModManager.AddonEnableSystem;
-using ModManager.AddonInstallerSystem;
 using ModManager.ModIoSystem;
 using System;
 using System.Collections.Generic;
@@ -8,20 +6,30 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ModManager.AddonInstallerSystem;
 using ModManager.VersionSystem;
 using File = Modio.Models.File;
+using Mod = Modio.Models.Mod;
 
 namespace ModManager.AddonSystem
 {
-    public class AddonService : Singleton<AddonService>, IAddonService
+    public class AddonService
     {
-        private readonly InstalledAddonRepository _installedAddonRepository = InstalledAddonRepository.Instance;
-        private readonly AddonInstallerService _addonInstallerService = AddonInstallerService.Instance;
-        private readonly AddonEnablerService _addonEnablerService = AddonEnablerService.Instance;
+        public static AddonService Instance;
+
+        private readonly InstalledAddonRepository _installedAddonRepository;
+        private readonly AddonInstallerService _addonInstallerService;
 
         private readonly Dictionary<Uri, byte[]> _imageCache = new();
 
         private readonly HttpClient _httpClient = new();
+
+        public AddonService(InstalledAddonRepository installedAddonRepository, AddonInstallerService addonInstallerService)
+        {
+            Instance = this;
+            _installedAddonRepository = installedAddonRepository;
+            _addonInstallerService = addonInstallerService;
+        }
 
         public void Install(Mod mod, string zipLocation)
         {
@@ -55,26 +63,6 @@ namespace ModManager.AddonSystem
             }
 
             _addonInstallerService.ChangeVersion(mod, file, zipLocation);
-        }
-
-        public void Enable(uint modId)
-        {
-            if (!_installedAddonRepository.TryGet(modId, out var manifest))
-            {
-                throw new AddonException($"Cannot enable modId: {modId}. Mod is not installed.");
-            }
-
-            _addonEnablerService.Enable(manifest);
-        }
-
-        public void Disable(uint modId)
-        {
-            if (!_installedAddonRepository.TryGet(modId, out var manifest))
-            {
-                throw new AddonException($"Cannot disable modId: {modId}. Mod is not installed.");
-            }
-
-            _addonEnablerService.Disable(manifest);
         }
         
         public IAsyncEnumerable<Dependency> GetDependencies(Mod mod)

@@ -1,20 +1,18 @@
 ﻿using System;
-using Modio.Models;
-using ModManager.AddonSystem;
 using ModManager.ModIoSystem;
 using ModManagerUI.UiSystem;
 using UnityEngine.UIElements;
+using Mod = Modio.Models.Mod;
 
 namespace ModManagerUI.Components.ModCard
 {
     public class EnabledToggle
     {
-        private readonly IAddonService _addonService = AddonService.Instance;
-        
         private readonly Toggle _root;
         private readonly Mod _mod;
         
         private Func<bool> _valueGetter = () => false;
+        private Func<bool> _enabledGetter = () => false;
         private Func<bool> _visibilityGetter = () => false;
         private Action _initializer = delegate {  };
 
@@ -31,14 +29,16 @@ namespace ModManagerUI.Components.ModCard
             if (_mod.IsInstalled() || ModHelper.IsModManager(_mod))
             {
                 _root.RegisterValueChangedCallback(changeEvent => OnToggleValueChanged(changeEvent, _mod));
-                if (ModHelper.ContainsBepInEx(_mod) || ModHelper.IsModManager(_mod))
+                if (ModHelper.IsModManager(_mod))
                 {
                     _valueGetter = () => true;
+                    _enabledGetter = () => true;
                     _visibilityGetter = () => true;
                 }
                 else
                 {
-                    _valueGetter = _mod.IsEnabled;
+                    _valueGetter = () => EnabledHelper.IsEnabled(_mod);
+                    _enabledGetter = () => UiSystem.ModManagerPanel.InstalledAddonRepository.Has(_mod.Id);
                     _visibilityGetter = _mod.IsInstalled;
                 }
                 _initialized = true;
@@ -54,6 +54,7 @@ namespace ModManagerUI.Components.ModCard
             if (!_initialized) 
                 _initializer();
             _root.SetValueWithoutNotify(_valueGetter());
+            _root.SetEnabled(_enabledGetter());
             _root.visible = _visibilityGetter();
         }
         

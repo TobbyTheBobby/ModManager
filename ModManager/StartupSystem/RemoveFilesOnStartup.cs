@@ -1,19 +1,25 @@
 ﻿using System.IO;
 using ModManager.AddonSystem;
 using ModManager.PersistenceSystem;
+using Timberborn.SingletonSystem;
 
 namespace ModManager.StartupSystem
 {
-    public class RemoveFilesOnStartup : Singleton<RemoveFilesOnStartup>, ILoadable
+    public class RemoveFilesOnStartup : ILoadableSingleton
     {
-        private readonly InstalledAddonRepository _addonRepository = InstalledAddonRepository.Instance;
+        private readonly InstalledAddonRepository _addonRepository;
 
         private readonly PathRemovalService _removalService = PathRemovalService.Instance;
 
-        public void Load(ModManagerStartupOptions startupOptions)
+        public RemoveFilesOnStartup(InstalledAddonRepository addonRepository)
         {
-            DeleteRemoveTaggedFiles(Paths.GameRoot);
-            DeleteRemoveTaggedDirectories(Paths.GameRoot);
+            _addonRepository = addonRepository;
+        }
+
+        public void Load()
+        {
+            // DeleteRemoveTaggedFiles(Paths.GameRoot);
+            // DeleteRemoveTaggedDirectories(Paths.GameRoot);
 
             foreach (var manifest in _addonRepository.All())
             {

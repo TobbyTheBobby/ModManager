@@ -1,5 +1,6 @@
 ﻿using Modio.Models;
 using ModManager.AddonSystem;
+using Mod = Modio.Models.Mod;
 
 namespace ModManager.ModIoSystem
 {
@@ -13,11 +14,6 @@ namespace ModManager.ModIoSystem
         public static bool IsInstalled(this Dependency dependency)
         {
             return InstalledAddonRepository.Instance.Has(dependency.ModId);
-        }
-
-        public static bool IsEnabled(this Mod mod)
-        {
-            return InstalledAddonRepository.Instance.TryGet(mod.Id, out var manifest) && manifest.Enabled;
         }
         
         public static bool IsModInstalled(this File mod)

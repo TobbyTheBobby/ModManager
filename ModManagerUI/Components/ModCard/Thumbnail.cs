@@ -35,7 +35,7 @@ namespace ModManagerUI.Components.ModCard
             }
             catch (HttpRequestException exception)
             {
-                ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {exception.Message}");
+                Debug.LogWarning($"Error occured while fetching image: {exception.Message}");
             }
         }
     }

@@ -1,6 +1,7 @@
 using System.Diagnostics;
-using Timberborn.Core;
+using Timberborn.ApplicationLifetime;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace ModManagerUI.UiSystem
 {
@@ -12,7 +13,7 @@ namespace ModManagerUI.UiSystem
 
         public static void QuitOrRestart()
         {
-            ModManagerUIPlugin.Log.LogError($"IsRestartCompatible: {SteamChecker.IsRestartCompatible()}");
+            Debug.LogError($"IsRestartCompatible: {SteamChecker.IsRestartCompatible()}");
             if (SteamChecker.IsRestartCompatible())
                 Restart();
             else

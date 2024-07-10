@@ -22,10 +22,10 @@ namespace ModManagerUI.Components.ModManagerPanel
             switch (enabledOptions)
             {
                 case EnabledOptions.Enabled:
-                    var enabledModIds = InstalledAddonRepository.Instance.All().Where(x => x.Enabled).Select(x => x.ModId).ToList();
+                    var enabledModIds = InstalledAddonRepository.Instance.All().Where(EnabledHelper.IsEnabled).Select(x => x.ResourceId).ToList();
                     return enabledModIds;
                 case EnabledOptions.NotEnabled:
-                    var notEnabledModIds = InstalledAddonRepository.Instance.All().Where(x => !x.Enabled).Select(x => x.ModId).ToList();
+                    var notEnabledModIds = InstalledAddonRepository.Instance.All().Where(manifest => !EnabledHelper.IsEnabled(manifest)).Select(manifest => manifest.ResourceId).ToList();
                     return notEnabledModIds;
                 default:
                     throw new ArgumentOutOfRangeException($"Value '{enabledOptions}' not a valid {nameof(EnabledOptions)}.");

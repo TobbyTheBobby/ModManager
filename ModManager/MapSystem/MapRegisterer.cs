@@ -1,23 +1,26 @@
-﻿using ModManager.AddonEnableSystem;
-using ModManager.AddonInstallerSystem;
+﻿using ModManager.AddonInstallerSystem;
 using ModManager.ExtractorSystem;
-using ModManager.ManifestLocationFinderSystem;
 using ModManager.ManifestValidatorSystem;
-using ModManager.StartupSystem;
+using Timberborn.SingletonSystem;
 
 namespace ModManager.MapSystem
 {
-    public class MapRegisterer : Singleton<MapRegisterer>, ILoadable
+    public class MapRegisterer : ILoadableSingleton
     {
         public const string RegistryId = "Map";
 
-        public void Load(ModManagerStartupOptions startupOptions)
+        private readonly MapInstaller _mapInstaller;
+
+        public MapRegisterer(MapInstaller mapInstaller)
         {
-            AddonInstallerRegistry.Instance.Add(RegistryId, new MapInstaller(startupOptions));
-            AddonEnablerRegistry.Instance.Add(RegistryId, new MapEnabler());
-            ManifestLocationFinderRegistry.Instance.Add(RegistryId, new MapManifestFinder(startupOptions.Logger));
+            _mapInstaller = mapInstaller;
+        }
+        
+        public void Load()
+        {
+            AddonInstallerRegistry.Instance.Add(RegistryId, _mapInstaller);
             AddonExtractorRegistry.Instance.Add(RegistryId, new MapExtractor());
-            ManifestValidatorRegistry.Instance.Add(RegistryId, new MapManifestValidator(startupOptions));
+            ManifestValidatorRegistry.Instance.Add(RegistryId, new MapManifestValidator());
         }
     }
 }

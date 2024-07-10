@@ -10,6 +10,7 @@ using ModManagerUI.EventSystem;
 using ModManagerUI.UiSystem;
 using Timberborn.CoreUI;
 using Timberborn.SingletonSystem;
+using UnityEngine;
 using UnityEngine.UIElements;
 using EventBus = ModManagerUI.EventSystem.EventBus;
 using File = Modio.Models.File;
@@ -79,15 +80,15 @@ namespace ModManagerUI.Components.ModManagerPanel
                 }
                 catch (MapException ex)
                 {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                    Debug.LogWarning(ex.Message);
                 }
                 catch (AddonException ex)
                 {
-                    ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                    Debug.LogWarning(ex.Message);
                 }
                 catch (IOException ex)
                 {
-                    ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+                    Debug.LogError($"{ex.Message}");
                 }
             }
             

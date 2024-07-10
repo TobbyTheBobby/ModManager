@@ -1,6 +1,7 @@
 ﻿using ModManager.LoggingSystem;
 using System;
 using ModManager;
+using UnityEngine;
 
 namespace ModManagerUI
 {
@@ -10,17 +11,17 @@ namespace ModManagerUI
         
         public void LogInfo(string message)
         {
-            ModManagerUIPlugin.Log.LogInfo(message);
+            Debug.Log(message);
         }
         
         public void LogWarning(string message)
         {
-            ModManagerUIPlugin.Log.LogWarning(message);
+            Debug.LogWarning(message);
         }
         
         public void LogError(string message)
         {
-            ModManagerUIPlugin.Log.LogError(message);
+            Debug.LogError(message);
         }
     }
 }

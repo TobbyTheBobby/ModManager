@@ -6,13 +6,14 @@ using ModManager;
 using ModManager.AddonSystem;
 using ModManager.MapSystem;
 using ModManager.ModIoSystem;
+using UnityEngine;
 using File = Modio.Models.File;
 
 namespace ModManagerUI.UiSystem
 {
     public class InstallController : Singleton<InstallController>
     {
-        private static readonly IAddonService AddonService = ModManager.AddonSystem.AddonService.Instance;
+        private static readonly AddonService AddonService = AddonService.Instance;
         
         public static async Task DownloadAndExtract(Mod mod, File? file)
         {
@@ -26,15 +27,15 @@ namespace ModManagerUI.UiSystem
             }
             catch (MapException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                Debug.LogWarning(ex.Message);
             }
             catch (AddonException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                Debug.LogWarning(ex.Message);
             }
             catch (IOException ex)
             {
-                ModManagerUIPlugin.Log.LogError($"{ex.Message}");
+                Debug.LogError($"{ex.Message}");
             }
             modCard?.ModActionStopped();
         }
@@ -64,11 +65,11 @@ namespace ModManagerUI.UiSystem
             }
             catch (IOException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                Debug.LogWarning(ex.Message);
             }
             catch (AddonException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                Debug.LogWarning(ex.Message);
             }
 
             modCard?.ModActionStopped();
@@ -89,17 +90,18 @@ namespace ModManagerUI.UiSystem
             }
             catch (MapException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                ModManagerUIPlugin.Log.LogWarning(ex.StackTrace);
+                Debug.LogWarning(ex.Message);
+                Debug.LogWarning(ex.StackTrace);
             }
             catch (AddonException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
-                ModManagerUIPlugin.Log.LogWarning(ex.StackTrace);
+                Debug.LogWarning(ex.Message);
+                Debug.LogWarning(ex.StackTrace);
             }
             catch (Exception ex)
             {
-                ModManagerUIPlugin.Log.LogError(ex.StackTrace);
+                Debug.LogError(ex.Message);
+                Debug.LogError(ex.StackTrace);
                 throw ex;
             }
         }

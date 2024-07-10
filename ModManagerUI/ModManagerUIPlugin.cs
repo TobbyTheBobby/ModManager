@@ -1,43 +1,14 @@
-﻿using BepInEx;
-using BepInEx.Logging;
-using HarmonyLib;
-using ModManager.ManifestValidatorSystem;
-using ModManager.StartupSystem;
-using ModManagerUI.LocalizationSystem;
-using System.IO;
-using System.Reflection;
+﻿using HarmonyLib;
+using Timberborn.ModManagerScene;
 
 namespace ModManagerUI
 {
-    [BepInPlugin("com.modmanagerui", "Mod Manager UI", "MODMANAGER_VERSION")]
-    public class ModManagerUIPlugin : BaseUnityPlugin
+    public class ModManagerUIPlugin : IModStarter
     {
-        public static PluginInfo PluginInfo = null!;
-        public static ManualLogSource Log = null!;
-
-        public void Awake()
+        public void StartMod()
         {
-            PluginInfo = Info;
-            Log = Logger; 
-
-            ModManagerStartup.Run("MOD_IO_APIKEY", options =>
-                {
-                    options.GameId = 3659;
-                    options.GamePath = BepInEx.Paths.GameRootPath;
-                    options.IsGameRunning = true;
-                    options.ModInstallationPath = Path.Combine(Paths.PluginPath);
-                    options.ModIoGameUrl = "https://mod.io/g/timberborn";
-                    options.ModManagerPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-                    options.Logger = new ModManagerLogger();
-                });
-
-            ManifestValidatorService.Instance.ValidateManifests();
-
             var harmony = new Harmony("com.modmanagerui");
             harmony.PatchAll();
-            LocalizationPatcher.Patch(harmony);
-            
-            CrashGuardSystem.CrashGuardSystemConfig.Initialize(Config);
         }
     }
 }

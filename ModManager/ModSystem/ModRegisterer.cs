@@ -1,20 +1,24 @@
-﻿using ModManager.AddonEnableSystem;
-using ModManager.AddonInstallerSystem;
+﻿using ModManager.AddonInstallerSystem;
 using ModManager.ExtractorSystem;
-using ModManager.ManifestLocationFinderSystem;
-using ModManager.StartupSystem;
+using Timberborn.SingletonSystem;
+using UnityEngine;
 
 namespace ModManager.ModSystem
 {
-    public class ModRegisterer : Singleton<ModRegisterer>, ILoadable
+    public class ModRegisterer : ILoadableSingleton
     {
         public const string RegistryId = "Mod";
 
-        public void Load(ModManagerStartupOptions startupOptions)
+        private readonly ModInstaller _modInstaller;
+
+        public ModRegisterer(ModInstaller modInstaller)
         {
-            AddonInstallerRegistry.Instance.Add(RegistryId, new ModInstaller());
-            AddonEnablerRegistry.Instance.Add(RegistryId, new ModEnabler());
-            ManifestLocationFinderRegistry.Instance.Add(RegistryId, new ModManifestFinder(startupOptions.Logger));
+            _modInstaller = modInstaller;
+        }
+
+        public void Load()
+        {
+            AddonInstallerRegistry.Instance.Add(RegistryId, _modInstaller);
             AddonExtractorRegistry.Instance.Add(RegistryId, new ModExtractor());
         }
     }

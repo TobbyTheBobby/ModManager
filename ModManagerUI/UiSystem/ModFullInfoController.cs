@@ -24,7 +24,7 @@ namespace ModManagerUI.UiSystem
         private readonly VisualElementInitializer _visualElementInitializer;
         private readonly InstalledAddonRepository _installedAddonRepository;
         private readonly DropdownItemsSetter _dropdownOptionsSetter;
-        private readonly IAddonService _addonService;
+        private readonly AddonService _addonService;
         private readonly PanelStack _panelStack;
         
         private readonly VisualElement _item = new();
@@ -39,7 +39,7 @@ namespace ModManagerUI.UiSystem
             VisualElementInitializer visualElementInitializer,
             InstalledAddonRepository installedAddonRepository,
             DropdownItemsSetter dropdownOptionsSetter,
-            IAddonService addonService,
+            AddonService addonService,
             PanelStack panelStack)
         {
             _visualElementInitializer = visualElementInitializer;
@@ -76,8 +76,8 @@ namespace ModManagerUI.UiSystem
             _currentMod = mod;
             CurrentFile = mod.Modfile;
 
-            var assetName = "assets/resources/ui/views/mods/ModsBoxFullItem.uxml";
-            var asset = AssetBundleLoader.AssetBundle.LoadAsset<VisualTreeAsset>(assetName);
+            var assetName = "ui/views/mods/ModsBoxFullItem";
+            var asset = ModManagerPanel.AssetLoader.Load<VisualTreeAsset>(assetName);
             var item = LoadVisualElement(asset);
 
             _versionsDropdown = item.Q<Dropdown>("Versions");
@@ -141,7 +141,7 @@ namespace ModManagerUI.UiSystem
             }
             catch (HttpRequestException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
+                Debug.LogWarning($"Error occured while fetching image: {ex.Message}");
             }
         }
 
@@ -198,7 +198,7 @@ namespace ModManagerUI.UiSystem
             }
             catch (HttpRequestException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning($"Error occured while fetching image: {ex.Message}");
+                Debug.LogWarning($"Error occured while fetching image: {ex.Message}");
             }
         }
 

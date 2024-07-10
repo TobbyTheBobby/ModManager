@@ -1,15 +1,16 @@
-﻿using Modio.Models;
+﻿using System.IO;
 using ModManager.AddonSystem;
+using Timberborn.Modding;
+using UnityEngine;
+using Mod = Modio.Models.Mod;
 
 namespace ModManagerUI.UiSystem
 {
     public abstract class EnableController
     {
-        public static bool AllowedToChangeState(Manifest manifest)
+        public static bool AllowedToChangeState(ModManagerManifest modManagerManifest)
         {
-            if (ModHelper.IsModManager(manifest))
-                return false;
-            if (ModHelper.ContainsBepInEx(manifest))
+            if (ModHelper.IsModManager(modManagerManifest))
                 return false;
             return true;
         }
@@ -18,54 +19,51 @@ namespace ModManagerUI.UiSystem
         {
             if (ModHelper.IsModManager(mod))
                 return false;
-            if (ModHelper.ContainsBepInEx(mod))
-                return false;
             return true;
         }
         
-        public static void ChangeState(Manifest manifest, bool state)
+        public static void ChangeState(ModManagerManifest modManagerManifest, bool newState)
         {
-            if (AllowedToChangeState(manifest))
+            if (AllowedToChangeState(modManagerManifest))
             {
-                ChangeState(manifest.ModId, state);
+                ChangeState(modManagerManifest.ResourceId, newState);
             }
             else
             {
-                ModManagerUIPlugin.Log.LogWarning($"Changing state of {manifest.ModName} is not allowed.");
+                Debug.LogWarning($"Changing state of {modManagerManifest.ModName} is not allowed.");
             }
         }
         
-        public static void ChangeState(Mod mod, bool state)
+        public static void ChangeState(Mod mod, bool newState)
         {
             if (AllowedToChangeState(mod))
             {
-                ChangeState(mod.Id, state);
+                ChangeState(mod.Id, newState);
             }
             else
             {
-                ModManagerUIPlugin.Log.LogWarning($"Changing state of {mod.Name} is not allowed.");
+                Debug.LogWarning($"Changing state of {mod.Name} is not allowed.");
             }
         }
 
-        private static void ChangeState(uint modId, bool state)
+        private static void ChangeState(uint modId, bool newState)
         {
             var modCard = ModCardRegistry.Get(modId);
             modCard?.ModActionStarted();
             try
             {
-                if (state)
+                if (InstalledAddonRepository.Instance.TryGet(modId, out var modManagerManifest))
                 {
-                    AddonService.Instance.Enable(modId);
+                    if (ModManagerPanel.ModLoader.TryLoadMod(new ModDirectory(new DirectoryInfo(modManagerManifest.RootPath), true, "Local"), out var timberbornMod))
+                    {
+                        ModPlayerPrefsHelper.ToggleMod(newState, timberbornMod);
+                        ModManagerPanel.ModsWereChanged = true;
+                    }
                 }
-                else
-                {
-                    AddonService.Instance.Disable(modId);
-                }
-                ModManagerPanel.ModsWereChanged = true;
             }
             catch (AddonException ex)
             {
-                ModManagerUIPlugin.Log.LogWarning(ex.Message);
+                Debug.LogWarning(ex.Message);
             }
             modCard?.ModActionStopped();
         }
