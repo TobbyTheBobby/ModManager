@@ -1,5 +1,4 @@
 using Bindito.Core;
-using ModManager.ExtractorSystem;
 using ModManager.LoggingSystem;
 using Timberborn.GameExitSystem;
 using Timberborn.SliderToggleSystem;
@@ -13,7 +12,6 @@ namespace ModManagerUI.UiSystem
         {
             containerDefinition.Bind<ModManagerRegisterer>().AsSingleton();
             containerDefinition.Bind<ModManagerPanel>().AsSingleton();
-            containerDefinition.Bind<AddonExtractorService>().ToInstance(AddonExtractorService.Instance);
             containerDefinition.Bind<GoodbyeBoxFactory>().AsSingleton();
             containerDefinition.Bind<ModFullInfoController>().AsSingleton();
             containerDefinition.Bind<SliderToggleButtonFactory>().AsSingleton();

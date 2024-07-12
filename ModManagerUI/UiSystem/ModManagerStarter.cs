@@ -20,8 +20,6 @@ namespace ModManagerUI.UiSystem
 
         public void Load()
         {
-            ManifestValidatorService.Instance.ValidateManifests();
-
             var modManifest = _modRepository.Mods.First(mod => mod.Manifest.Id == "ModManager");
             
             ModManagerStartup.Run("MOD_IO_APIKEY", options =>

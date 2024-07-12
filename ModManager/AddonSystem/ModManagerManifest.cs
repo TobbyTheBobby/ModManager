@@ -7,9 +7,9 @@ namespace ModManager.AddonSystem
     {
         public const string FileName = "mod_manager_manifest.json";
 
+        [JsonConstructor]
         public ModManagerManifest()
         {
-            
         }
         
         public ModManagerManifest(string installLocation, Mod mod, File file)
@@ -28,7 +28,7 @@ namespace ModManager.AddonSystem
         public uint ResourceId { get; set; }
         
         [JsonProperty(Required = Required.AllowNull)]
-        public string? ModName { get; set; } = null!;
+        public string? ModName { get; set; }
 
         [JsonProperty(Required = Required.AllowNull)]
         public string? Version { get; set; }

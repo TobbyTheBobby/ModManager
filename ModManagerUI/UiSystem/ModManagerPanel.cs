@@ -185,7 +185,6 @@ namespace ModManagerUI.UiSystem
 
         private void OpenOptionsPanel()
         {
-            ManifestValidatorService.Instance.ValidateManifests();
             PanelStack.HideAndPush(this);
         }
 

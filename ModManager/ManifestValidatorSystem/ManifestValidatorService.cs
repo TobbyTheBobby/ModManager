@@ -1,12 +1,20 @@
-﻿namespace ModManager.ManifestValidatorSystem
-{
-    public class ManifestValidatorService : Singleton<ManifestValidatorService>
-    {
-        private readonly ManifestValidatorRegistry _manifestValidatorRegistry = ManifestValidatorRegistry.Instance;
+﻿using System.Collections.Generic;
+using Timberborn.SingletonSystem;
 
-        public void ValidateManifests()
+namespace ModManager.ManifestValidatorSystem
+{
+    public class ManifestValidatorService : ILoadableSingleton
+    {
+        private readonly IEnumerable<IManifestValidator> _manifestValidators;
+
+        public ManifestValidatorService(IEnumerable<IManifestValidator> manifestValidators)
         {
-            foreach (var validator in _manifestValidatorRegistry.GetManifestValidator())
+            _manifestValidators = manifestValidators;
+        }
+
+        public void Load()
+        {
+            foreach (var validator in _manifestValidators)
             {
                 validator.ValidateManifests();
             }

@@ -6,8 +6,6 @@ using ModManager.AddonSystem;
 using ModManager.ExtractorSystem;
 using ModManager.MapSystem;
 using ModManager.PersistenceSystem;
-using Timberborn.Modding;
-using UnityEngine;
 using Mod = Modio.Models.Mod;
 
 namespace ModManager.ModSystem
@@ -15,15 +13,14 @@ namespace ModManager.ModSystem
     public class ModInstaller : IAddonInstaller
     {
         private readonly InstalledAddonRepository _installedAddonRepository;
-        private readonly ModLoader _modLoader;
-
-        private readonly AddonExtractorService _addonExtractorService = AddonExtractorService.Instance;
+        private readonly AddonExtractorService _addonExtractorService;
+        
         private readonly PersistenceService _persistenceService = PersistenceService.Instance;
 
-        public ModInstaller(InstalledAddonRepository installedAddonRepository, ModLoader modLoader)
+        public ModInstaller(InstalledAddonRepository installedAddonRepository, AddonExtractorService addonExtractorService)
         {
             _installedAddonRepository = installedAddonRepository;
-            _modLoader = modLoader;
+            _addonExtractorService = addonExtractorService;
         }
 
         public bool Install(Mod mod, string zipLocation)
@@ -74,9 +71,9 @@ namespace ModManager.ModSystem
         }
 
 
-        private void DeleteFilesFromFolder(DirectoryInfo dir)
+        private void DeleteFilesFromFolder(DirectoryInfo directoryInfo)
         {
-            foreach (var file in dir.GetFiles())
+            foreach (var file in directoryInfo.GetFiles())
             {
                 try
                 {
@@ -93,15 +90,15 @@ namespace ModManager.ModSystem
             }
         }
 
-        private void TryDeleteFolder(DirectoryInfo dir)
+        private void TryDeleteFolder(DirectoryInfo directoryInfo)
         {
-            if (dir.EnumerateDirectories().Any() == false && dir.EnumerateFiles().Any() == false)
+            if (directoryInfo.EnumerateDirectories().Any() == false && directoryInfo.EnumerateFiles().Any() == false)
             {
-                dir.Delete();
+                directoryInfo.Delete();
             }
             else
             {
-                dir.MoveTo($"{dir.FullName}{Names.Extensions.Remove}");
+                directoryInfo.MoveTo($"{directoryInfo.FullName}{Names.Extensions.Remove}");
             }
         }
     }

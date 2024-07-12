@@ -1,6 +1,6 @@
 {
   "Name": "Mod Manager",
-  "Version": "3.0.1",
+  "Version": "3.0.2",
   "Id": "ModManager",
   "MinimumGameVersion": "0.6.0.0",
   "Description": "The very first mod manager",

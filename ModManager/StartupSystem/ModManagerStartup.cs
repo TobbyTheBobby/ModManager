@@ -13,7 +13,6 @@ namespace ModManager.StartupSystem
         {
             Paths.Instance,
             ModIoGameInfo.Instance,
-            ModManagerRegisterer.Instance,
             
             ModManagerExtractor.Instance
         };

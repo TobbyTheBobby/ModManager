@@ -1,14 +1,20 @@
-﻿using Modio.Models;
+﻿using System.Collections.Generic;
+using Modio.Models;
 
 namespace ModManager.ExtractorSystem
 {
-    public class AddonExtractorService : Singleton<AddonExtractorService>
+    public class AddonExtractorService
     {
-        private readonly AddonExtractorRegistry _addonExtractorRegistry = AddonExtractorRegistry.Instance;
+        private readonly IEnumerable<IAddonExtractor> _addonInstallers;
+
+        public AddonExtractorService(IEnumerable<IAddonExtractor> addonInstallers)
+        {
+            _addonInstallers = addonInstallers;
+        }
 
         public string Extract(Mod addonInfo, string addonZipLocation, bool overwrite = true)
         {
-            foreach (var extractor in _addonExtractorRegistry.GetAddonExtractor())
+            foreach (var extractor in _addonInstallers)
             {
                 if (extractor.Extract(addonZipLocation, addonInfo, out var extractLocation))
                 {

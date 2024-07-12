@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ModManager.AddonSystem;
 using ModManager.ManifestLocationFinderSystem;
 using ModManager.PersistenceSystem;
@@ -25,6 +26,7 @@ namespace ModManager.MapSystem
             try
             {
                 var manifests = _persistenceService.LoadObject<List<MapModManagerManifest>>(manifestPath, false);
+                UpdateManifestInfo(manifests);
                 return manifests;
             }
             catch (JsonSerializationException ex)
@@ -35,6 +37,14 @@ namespace ModManager.MapSystem
             catch (Exception)
             {
                 throw;
+            }
+        }
+        
+        private void UpdateManifestInfo(List<MapModManagerManifest> manifests)
+        {
+            foreach (var mapManifest in manifests)
+            {
+                mapManifest.RootPath = Paths.Maps;
             }
         }
     }

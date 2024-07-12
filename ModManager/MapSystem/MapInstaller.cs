@@ -15,15 +15,16 @@ namespace ModManager.MapSystem
     public class MapInstaller : IAddonInstaller
     {
         private readonly InstalledAddonRepository _installedAddonRepository;
+        private readonly AddonExtractorService _addonExtractorService;
         private readonly ModLoader _modLoader;
 
         private readonly PersistenceService _persistenceService = PersistenceService.Instance;
-        private readonly AddonExtractorService _addonExtractorService = AddonExtractorService.Instance;
         private readonly MapManifestFinder _mapManifestFinder = new();
 
-        public MapInstaller(InstalledAddonRepository installedAddonRepository, ModLoader modLoader)
+        public MapInstaller(InstalledAddonRepository installedAddonRepository, AddonExtractorService addonExtractorService, ModLoader modLoader)
         {
             _installedAddonRepository = installedAddonRepository;
+            _addonExtractorService = addonExtractorService;
             _modLoader = modLoader;
         }
 

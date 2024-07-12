@@ -15,11 +15,12 @@ namespace ModManager.MapSystem
             {
                 return false;
             }
+
             using (var zipFile = ZipFile.OpenRead(addonZipLocation))
             {
                 var timberFiles = zipFile.Entries
-                                         .Where(x => x.Name.Contains(".timber"))
-                                         .ToList();
+                    .Where(x => x.Name.Contains(".timber"))
+                    .ToList();
 
                 if (timberFiles.Count() == 0)
                 {

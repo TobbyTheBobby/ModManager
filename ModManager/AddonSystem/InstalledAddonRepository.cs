@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ModManager.ManifestLocationFinderSystem;
-using Timberborn.Modding;
 using Timberborn.SingletonSystem;
 
 namespace ModManager.AddonSystem
